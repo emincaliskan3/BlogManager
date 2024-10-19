@@ -22,7 +22,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<Post>> GetAsync()
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Posts.Include(x => x.Category).ToListAsync();
         }
 
         // GET api/<PostsController>/5

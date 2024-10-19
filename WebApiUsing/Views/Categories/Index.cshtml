@@ -11,7 +11,7 @@
         <th>Resim</th>
         <th>Durum</th>
         <th>Anasayfa</th>
-        <th>İşlemler</th>
+        <th>Sil</th>
     </tr>
     <tbody id="list"></tbody>
 </table>
@@ -19,78 +19,99 @@
 <input type="hidden" id="Id" />
 <input type="hidden" id="ImageName" />
 
+
+
 <hr />
 
-<table class="table">
 
-    <tr>
-        <td>Kategori Adı</td>
-        <td>
-            <input type="text" value="" id="Name" name="Name" class="form-control" />
-        </td>
-    </tr>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Yeni Kayıt
+</button>
 
-    <tr>
-        <td>Açıklama</td>
-        <td>
-            <textarea id="Description" name="Descripton" rows="5" class="form-control">
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+
+                    <tr>
+                        <td>Kategori Adı</td>
+                        <td>
+                            <input type="text" value="" id="Name" name="Name" class="form-control" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Açıklama</td>
+                        <td>
+                            <textarea id="Description" name="Descripton" rows="5" class="form-control">
 </textarea>
-        </td>
-    </tr>
+                        </td>
+                    </tr>
 
-    <tr>
-        <td>Resim</td>
-        <td>
-            <input type="file" value="" id="Image" name="Image" />
-        </td>
-    </tr>
+                    <tr>
+                        <td>Resim</td>
+                        <td>
+                            <input type="file" value="" id="Image" name="Image" />
+                            <div id="resim"></div>
+                            <input type="hidden" id="ImageName" />
+                        </td>
+                    </tr>
 
-    <tr>
-        <td>Durum</td>
-        <td>
-            <input type="checkbox" id="IsActive" name="IsActive" />
-            <label for="IsActive">Aktif</label>
-        </td>
-    </tr>
+                    <tr>
+                        <td>Durum</td>
+                        <td>
+                            <input type="checkbox" id="IsActive" name="IsActive" />
+                            <label for="IsActive">Aktif</label>
+                        </td>
+                    </tr>
 
-    <tr>
-        <td>Anasayfa</td>
-        <td>
-            <input type="checkbox" id="IsHome" name="IsHome" />
-            <label for="IsHome">Aktif</label>
-        </td>
-    </tr>
+                    <tr>
+                        <td>Anasayfa</td>
+                        <td>
+                            <input type="checkbox" id="IsHome" name="IsHome" />
+                            <label for="IsHome">Aktif</label>
+                        </td>
+                    </tr>
 
-    <tr>
-        <td>
-        </td>
-        <td>
-            <button class="btn btn-primary" onclick="Add()">Ekle</button>
-            <button class="btn btn-success" onclick="Update()">Güncelle</button>
-        </td>
-    </tr>
-</table>
+
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button class="btn btn-primary" onclick="Add()">Ekle</button>
+                <button class="btn btn-success" onclick="Update()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
         function GetAll() {
 
-            fetch("https://localhost:7106/api/categories/") // fetch metodunu bu şekilde istek atacağımız sunucuyu parametre vererek kullanıyoruz
-                .then(response => response.json()) // bu satır apiden dönen sonucu json a dönüştürür
+            fetch("https://localhost:7106/api/categories") 
+                .then(response => response.json()) 
                 .then(data => {
-                    // console.log(data) // api den dönen nesneyi tarayıcı konsoluna bastır
-                    console.log(data) // api den dönen ürün listesini tarayıcı konsoluna bastır
-                    let div = document.getElementById("list") // ekrandaki products id li elementi seç
-                    data.forEach(p => { // gelen data içindeki products listesinde forEach ile dön
-                        // listedeki her bir ürünü
+                    
+                    console.log(data)
+                    let div = document.getElementById("list") 
+                    data.forEach(p => { 
+
                         div.innerHTML += `<tr>
                                             <td>${p.id}</td>
                                             <td> ${p.name} </td>
-                                            <td><img src="https://localhost:7106/Images/${p.image}" alt="" height="34" /></td>
+                                                    <td><img src="https://localhost:7106/Images/${p.image}" alt="" height="34" /></td>
                                             <td> ${p.isActive} </td>
                                             <td> ${p.isHome} </td>
                                             <td>
-                          <input type="button" name="edit" value="Düzenle" class="btn btn-primary" onclick="Edit(${p.id})" />
+                                  <input type="button" name="edit" value="Düzenle" class="btn btn-primary" onclick="Edit(${p.id})" data-bs-toggle="modal" data-bs-target="#exampleModal" />
                           <input type="button" name="delete" value="Sil" class="btn btn-danger" onclick="Delete(${p.id})" />
                                             </td>
                                                       </tr>` // yatay tırnak klavyeden ctrl+ alt + , e basarak açılıyor
@@ -98,21 +119,32 @@
                     })/* */
                 })
                 .catch(error => {
-                    // eğer api isteğinde hata oluşmazsa buraya yakalayıp kullanabiliriz
+                    
                     console.warn(error)
                     alert(error + "Hatası Oluştu!")
-                    // veya burada db de logs tablosu yapıp kaydedebiliriz.
+                   
                 })
         }
         GetAll();
         function Add() {
+            if (!document.getElementById("Name").value) {
+                alert("Kategori Adı Boş Geçilemez") 
+                return false; 
+            }
+            // dosya yükleme
+            var formData = new FormData();
+            var fileField = document.querySelector("input[type='file']"); // dosya yükleme elementini bul
+            formData.append("formFile", fileField.files[0]);
+
+
+
             fetch("https://localhost:7106/api/categories/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     Name: document.getElementById("Name").value,
                     Descripton: document.getElementById("Description").value,
-                    Image: document.getElementById("Image").value,
+                    Image: formData.get("formFile").name, //document.getElementById("Image").value,
                     IsActive: document.getElementById("IsActive").checked,
                     IsHome: document.getElementById("IsHome").checked
                 }) // body bitiş
@@ -120,6 +152,7 @@
             }) // fetch bitiş
                 .then((response) => {
                     if (response.ok) { // eğer işlem sonucu başarılıysa sunucudan ok cevabı geliyor
+                        upload(formData);
                         location.reload();  // sayfayı yenile
 
                     }
@@ -142,6 +175,7 @@
                     document.getElementById("Name").value = data.name
                     document.getElementById("Description").value = data.description
                     document.getElementById("ImageName").value = data.image
+                    document.getElementById("resim").innerHTML = `<img src="https://localhost:7106/Images/${data.image}" alt="" height="34" />`
                     document.getElementById("IsActive").checked = data.isActive
                     document.getElementById("IsHome").checked = data.isHome
 
@@ -149,7 +183,23 @@
 
         }
         function Update() {
+            if (!document.getElementById("Name").value) { // eğer kategori adı boşsa
+                alert("Kategori Adı Boş Geçilemez") // uyarı ver
+                return false; // geri dön
+            }
+            // dosya yükleme
+            var formData = new FormData();
+            var fileField = document.querySelector("input[type='file']"); // dosya yükleme elementini bul
+            formData.append("formFile", fileField.files[0]);
+
             var id = document.getElementById("Id").value
+            var resim = document.getElementById("ImageName").value
+
+            // eğer güncellemede yeni dosya seçilmemişse
+            if (fileField.files[0]) {
+                resim = formData.get("formFile").name
+            }
+
             fetch("https://localhost:7106/api/categories/" + id, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -157,7 +207,7 @@
                     Id: id,
                     Name: document.getElementById("Name").value,
                     Descripton: document.getElementById("Description").value,
-                    Image: document.getElementById("Image").value,
+                    Image: resim, // document.getElementById("Image").value
                     IsActive: document.getElementById("IsActive").checked,
                     IsHome: document.getElementById("IsHome").checked
                 }) // body bitiş
@@ -165,6 +215,7 @@
             }) // fetch bitiş
                 .then((response) => {
                     if (response.ok) { // eğer işlem sonucu başarılıysa sunucudan ok cevabı geliyor
+                        upload(formData);
                         location.reload();  // sayfayı yenile
 
                     }
@@ -178,25 +229,42 @@
                 })
         }
         function Delete(id) {
+            if (confirm("Kaydı Silmek İstiyor Musunuz?")) {
+                fetch("https://localhost:7106/api/categories/" + id, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" }
 
-            fetch("https://localhost:7106/api/categories/" + id, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" }
+                }) // fetch bitiş
+                    .then((response) => {
+                        if (response.ok) { // eğer işlem sonucu başarılıysa sunucudan ok cevabı geliyor
+                            location.reload();  // sayfayı yenile
 
-            }) // fetch bitiş
-                .then((response) => {
-                    if (response.ok) { // eğer işlem sonucu başarılıysa sunucudan ok cevabı geliyor
-                        location.reload();  // sayfayı yenile
+                        }
+                        else {
+                            throw new Error("İşlem Başarısız Oldu!") // hata fırlat
+                        }
+                    }) // then bitiş
+                    .catch(error => {
+                        console.error("Hata Oluştu!", error)
+                        alert("Hata Oluştu!")
+                    })
+            }
+        }
 
-                    }
-                    else {
-                        throw new Error("İşlem Başarısız Oldu!") // hata fırlat
-                    }
-                }) // then bitiş
-                .catch(error => {
-                    console.error("Hata Oluştu!", error)
-                    alert("Hata Oluştu!")
-                })
+
+        // js ile apiye resim yükleme
+        async function upload(formData) {
+            try {
+                const response = await fetch("https://localhost:7106/api/upload/", {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await response.json();
+                console.log(result);
+            }
+            catch (error) {
+                console.log(error);
+            }
 
         }
     </script>
